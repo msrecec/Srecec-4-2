@@ -171,7 +171,7 @@ public class Glavna {
 
                 input.nextLine();
 
-                if (brojZupanija < 0) {
+                if (brojZupanija < 1) {
 
                     System.out.println("Pogrešan unos! Molimo unesite pozitivan cijeli broj.");
 
