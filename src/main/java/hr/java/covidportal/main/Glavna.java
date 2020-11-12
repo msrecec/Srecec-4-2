@@ -39,6 +39,7 @@ public class Glavna {
         Set<Bolest> bolesti = new HashSet<>();
         List<Osoba> osobe = new ArrayList<>();
         Map<Bolest, List<Osoba>> OsobeZarazeneVirusima = new HashMap<>();
+        Map<String,List<Osoba>> grupeIstihImena = new HashMap<>();
 
         // Unos Zupanija
 
@@ -55,6 +56,32 @@ public class Glavna {
         // Unos osoba
 
         unosOsoba(input, zupanije, bolesti, osobe);
+
+        // Zadatak 1
+
+        osobe.stream()
+                .sorted(((Comparator
+                        .comparing(Osoba::getPrezime)
+                        .thenComparing(Osoba::getKorisnickoIme))))
+                .forEach(System.out::println);
+
+        // Zadatak 2
+
+        System.out.println(osobe.stream()
+                .min(Comparator
+                        .comparing(Osoba::getIme)
+                        .thenComparing(Osoba::getPrezime)));
+        System.out.println(osobe.stream()
+                .max(Comparator
+                        .comparing(Osoba::getPrezime)
+                        .thenComparing(Osoba::getIme)));
+
+        // Zadatak 3
+
+        populacijaMapeGrupeIstihImena(grupeIstihImena, osobe);
+
+        ispisMapeGrupeIstihImena(grupeIstihImena);
+
 
         // Populacija Mape OsobeZarazeneVirusima
 
@@ -142,6 +169,55 @@ public class Glavna {
     }
 
     /**
+     * Popunjava mapu grupeIstihImena sa grupama osoba sa istim imenima kojima su zarazene
+     *
+     * @param osobe                 unesene osobe
+     * @param grupeIstihImena konacna mapa
+     */
+
+    private static void populacijaMapeGrupeIstihImena(Map<String,List<Osoba>> grupeIstihImena, List<Osoba> osobe) {
+
+        for (Osoba osoba : osobe) {
+
+            List<Osoba> grupaOsoba;
+
+            if (grupeIstihImena.containsKey(osoba.getIme())) {
+
+                grupaOsoba = grupeIstihImena.get(osoba.getIme());
+
+            } else {
+                grupaOsoba = new ArrayList<>();
+
+            }
+            grupaOsoba.add(osoba);
+            grupeIstihImena.put(osoba.getIme(), grupaOsoba);
+        }
+    }
+
+    /**
+     * Ispisuje Bolesti/Viruse i osobe koje ih imaju
+     *
+     * @param grupeIstihImena mapa osoba i virusa
+     */
+
+
+    private static void ispisMapeGrupeIstihImena(Map<String,List<Osoba>> grupeIstihImena) {
+        for (String ime : grupeIstihImena.keySet()) {
+
+            System.out.println("U grupi sa imenom: " + ime);
+
+            if (grupeIstihImena.get(ime).size() > 1) {
+                for (Osoba osoba : grupeIstihImena.get(ime)) {
+                    System.out.print(osoba.getIme() + " " + osoba.getPrezime() + ", ");
+                }
+                System.out.print("\n");
+            } else if (grupeIstihImena.get(ime).size() == 1) {
+                System.out.println(grupeIstihImena.get(ime).get(0).getIme() + " " + grupeIstihImena.get(ime).get(0).getPrezime());
+            }
+        }
+    }
+
+    /**
      * Unosi županije u polje županija <code>Zupanija[] zupanije</code>
      * <p>
      * Unosi nazive županija <code>String nazivZupanije</code> i broj stanovnika <code>int brojStanovnika</code>
@@ -173,7 +249,7 @@ public class Glavna {
 
                 if (brojZupanija < 1) {
 
-                    System.out.println("Pogrešan unos! Molimo unesite pozitivan cijeli broj.");
+                    System.out.println("Pogrešan unos! Molimo unesite broj veci od 1.");
 
                     logger.error("Prilikom unosa broja županija unesen je negativan broj.");
 
@@ -842,7 +918,7 @@ public class Glavna {
         List<Osoba> odabraneUneseneKontaktiraneOsobe = new ArrayList<>();
         Osoba odabranaUnesenaKontaktiranaOsoba = null;
         int brojKontaktiranihOsoba = 0;
-        String ime, prezime;
+        String ime, prezime, korisnickoIme;
         Integer starost = 0;
         Zupanija zupanija = null;
         Bolest zarazenBolescu = null, odabranaUnesenaBolest = null;
@@ -901,6 +977,11 @@ public class Glavna {
 
             System.out.printf("Unesite prezime %d. osobe: ", i + 1);
             prezime = input.nextLine();
+
+            // Unos korisnickog imena
+
+            System.out.printf("Unesite korisnicko ime %d. osobe: ", i + 1);
+            korisnickoIme = input.nextLine();
 
             // Unos starosti i validacija unosa
 
@@ -1227,10 +1308,10 @@ public class Glavna {
             // Spremanje osoba u polje osoba
 
             if (i == 0) {
-                osobe.add(new Osoba.Builder(ime).prezime(prezime).starost(starost).zupanija(zupanija)
+                osobe.add(new Osoba.Builder(ime).prezime(prezime).korisnickoIme(korisnickoIme).starost(starost).zupanija(zupanija)
                         .zarazenBolescu(zarazenBolescu).build());
             } else {
-                osobe.add(new Osoba.Builder(ime).prezime(prezime).starost(starost).zupanija(zupanija)
+                osobe.add(new Osoba.Builder(ime).prezime(prezime).korisnickoIme(korisnickoIme).starost(starost).zupanija(zupanija)
                         .zarazenBolescu(zarazenBolescu).kontaktiraneOsobe(kontaktiraneOsobe).build());
             }
         }
